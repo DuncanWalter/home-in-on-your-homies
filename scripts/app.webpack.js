@@ -3,10 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const path = require('path');
 const options = require('minimist')(process.argv.slice(2));
-
-const pkg = require('./../package.json');
 const env = require('babel-preset-env');
-
 
 const plugins = (options => {
     let fragments = {
@@ -14,8 +11,8 @@ const plugins = (options => {
             new webpack.HotModuleReplacementPlugin(),
             new webpack.NoEmitOnErrorsPlugin(),
             new HtmlWebpackPlugin({
-                filename: 'index.bundle.html',
-                template: './src/index.html',
+                filename: 'app.index.bundle.html',
+                template: './src/app/index.html',
                 inject: true,
             }),
             new FriendlyErrorsPlugin(),
@@ -37,8 +34,8 @@ const plugins = (options => {
                 comments: false,
             }),
             new HtmlWebpackPlugin({
-                filename: 'index.bundle.html',
-                template: './src/index.html',
+                filename: 'app.index.bundle.html',
+                template: './src/app/index.html',
                 inject: true,
             }),
         ],
@@ -46,7 +43,6 @@ const plugins = (options => {
 
         ],
     };
-
     return Object.keys(options).reduce((a, k) => {
         return fragments[k] ? a.concat(fragments[k]) : a;
     }, [
@@ -57,8 +53,8 @@ const plugins = (options => {
 })(options);
 
 const entry = (() => {
-    return !options.dev ? './src/index.js' : [
-        './src/index.js',
+    return !options.dev ? './src/app/index.js' : [
+        './src/app/index.js',
         'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
     ];
 })();
@@ -67,7 +63,7 @@ const config = {
     entry,
     output: {
         path: path.join(__dirname, './../dist'),
-        filename: 'index.bundle.js',
+        filename: 'app.index.bundle.js',
         libraryTarget: 'umd',
     },
     module: { 
@@ -85,7 +81,7 @@ const config = {
                             ],
                             node: 'current',
                         }
-                    }], 'flow'],
+                    }]],
                     cacheDirectory: true,
                 }
             }],
@@ -118,9 +114,6 @@ const config = {
     plugins,
 };
 
-
-console.log(options);
-
 if(options.dev){
     const Express = require('express');
 
@@ -130,7 +123,7 @@ if(options.dev){
     var devMiddleware = require('webpack-dev-middleware')(compiler, {
         publicPath: '/',
         quiet: true,
-        index: __dirname + 'index.bundle.html',
+        index: path.join(__dirname, 'app.index.bundle.html'),
         watchOptions: {
             aggregateTimeout: 300,
             poll: true,
@@ -144,9 +137,7 @@ if(options.dev){
     });
     
     // force page reload when html-webpack-plugin template changes
-    compiler.plugin('compilation', function (/*compilation*/) {
-        hotMiddleware.publish({ action: 'reload' });
-    });
+    compiler.plugin('compilation', (__) => hotMiddleware.publish({ action: 'reload' }));
     
     // serve webpack bundle output
     app.use(devMiddleware);
@@ -155,15 +146,16 @@ if(options.dev){
     // compilation error display
     app.use(hotMiddleware);
     
+    // TODO: Just no
     app.use(function (req, res, next){
         let filePath;
         if(/.*([a-zA-Z0-9_-]+)\.plugin\.js$/.test(req.path)){
-            filePath = __dirname + './../dist/index.bundle.js';
+            filePath = __dirname + './../dist/app.index.bundle.js';
             // TODO enable plugin services
             res.send('console.log(\'plugin services not yet enabled\')');
             res.end();
         } else if(/index\.bundle\.js/.test(req.path)){
-            filePath = __dirname + './../dist/index.bundle.js';
+            filePath = __dirname + './../dist/app.index.bundle.js';
             compiler.outputFileSystem.readFile(filePath, function(err, result){
                 if(err){ return next(err); }
                 res.send(result);
@@ -173,7 +165,7 @@ if(options.dev){
             console.log('> HMR json requested...')
             next();
         } else {
-            filePath = __dirname + './../dist/index.bundle.html';
+            filePath = __dirname + './../dist/app.index.bundle.html';
             compiler.outputFileSystem.readFile(filePath, function(err, result){
                 if(err){ return next(err); }
                 res.set('content-type','text/html');
@@ -183,17 +175,16 @@ if(options.dev){
         }
     });
     
-    var uri = 'http://localhost:3674';
-    
     console.log('> Starting dev server...');
     devMiddleware.waitUntilValid(() => {
-        console.log('> Listening at ' + uri + '\n');
+        const port = 3674;
+        const uri = `http://localhost:${port}`;        
+        app.listen(port);
+        console.log(`> Listening at ${uri}\n`);
     });
-    
-    app.listen(3674);
+
 } else {
     console.log("> Starting production build...");
-    
     webpack(config, ()=>{
         console.log("> Completed production build!");
     });
