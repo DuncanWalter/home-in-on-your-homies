@@ -11,8 +11,8 @@ const plugins = (options => {
             new webpack.HotModuleReplacementPlugin(),
             new webpack.NoEmitOnErrorsPlugin(),
             new HtmlWebpackPlugin({
-                filename: 'app.index.bundle.html',
-                template: './src/app/index.html',
+                filename: 'index.bundle.html',
+                template: './src/index.html',
                 inject: true,
             }),
             new FriendlyErrorsPlugin(),
@@ -34,8 +34,8 @@ const plugins = (options => {
                 comments: false,
             }),
             new HtmlWebpackPlugin({
-                filename: 'app.index.bundle.html',
-                template: './src/app/index.html',
+                filename: 'index.bundle.html',
+                template: './src/index.html',
                 inject: true,
             }),
         ],
@@ -53,8 +53,8 @@ const plugins = (options => {
 })(options);
 
 const entry = (() => {
-    return !options.dev ? './src/app/index.js' : [
-        './src/app/index.js',
+    return !options.dev ? './src/index.js' : [
+        './src/index.js',
         'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
     ];
 })();
@@ -63,7 +63,7 @@ const config = {
     entry,
     output: {
         path: path.join(__dirname, './../dist'),
-        filename: 'app.index.bundle.js',
+        filename: 'index.bundle.js',
         libraryTarget: 'umd',
     },
     module: { 
@@ -123,7 +123,7 @@ if(options.dev){
     var devMiddleware = require('webpack-dev-middleware')(compiler, {
         publicPath: '/',
         quiet: true,
-        index: path.join(__dirname, 'app.index.bundle.html'),
+        index: path.join(__dirname, 'index.bundle.html'),
         watchOptions: {
             aggregateTimeout: 300,
             poll: true,
@@ -146,41 +146,55 @@ if(options.dev){
     // compilation error display
     app.use(hotMiddleware);
     
-    // TODO: Just no
+    // TODO: Do we need anything here? How about the other libraries?
+    // TODO: Should use a send file method, realistically
     app.use(function (req, res, next){
-        let filePath;
-        if(/.*([a-zA-Z0-9_-]+)\.plugin\.js$/.test(req.path)){
-            filePath = __dirname + './../dist/app.index.bundle.js';
-            // TODO enable plugin services
-            res.send('console.log(\'plugin services not yet enabled\')');
-            res.end();
-        } else if(/index\.bundle\.js/.test(req.path)){
-            filePath = __dirname + './../dist/app.index.bundle.js';
-            compiler.outputFileSystem.readFile(filePath, function(err, result){
-                if(err){ return next(err); }
-                res.send(result);
-                res.end();
-            });
-        } else if(/\.json$/.test(req.path)){
-            console.log('> HMR json requested...')
-            next();
-        } else {
-            filePath = __dirname + './../dist/app.index.bundle.html';
-            compiler.outputFileSystem.readFile(filePath, function(err, result){
-                if(err){ return next(err); }
-                res.set('content-type','text/html');
-                res.send(result);
-                res.end();
-            });
-        }
+        const extensions = {
+            js:   /index\.bundle\.js$/,
+            html: /index\.bundle\.html$/,
+            man_json: /manifest\.json$/,
+            dev_json: /\.json$/,
+            default: /./,            
+        };
+        const behaviors ={
+            js: __ => {
+                res.type('js');
+                filePath = path.join(__dirname, `../dist/index.bundle.js`);                
+                compiler.outputFileSystem.readFile(filePath, (err, result) => {
+                    if (err) next(err); 
+                    res.send(result).end();
+                });
+            },
+            html: __ => {
+                res.type('html');
+                filePath = path.join(__dirname, `../dist/index.bundle.html`);
+                compiler.outputFileSystem.readFile(filePath, (err, result) => {
+                    if (err) next(err); 
+                    res.send(result).end();
+                });
+            },
+            man_json: __ => {
+                res.sendFile(path.join(__dirname, '../src/manifest.json'));
+            },
+            dev_json: __ => next(),
+            default(){ this.html() },
+        };
+        let done = 0;
+        for(let key of Object.keys(extensions)){
+            if(extensions[key].test(req.path) && !done++){
+                behaviors[key]();
+            }
+        };
     });
     
     console.log('> Starting dev server...');
     devMiddleware.waitUntilValid(() => {
+        // TODO: take as a CLI argument so that the
+        // three libraries can interact via shelljs
         const port = 3674;
-        const uri = `http://localhost:${port}`;        
+        const uri = `http://localhost:${port}`;
+        console.log(`> Listening at ${uri}\n`);      
         app.listen(port);
-        console.log(`> Listening at ${uri}\n`);
     });
 
 } else {

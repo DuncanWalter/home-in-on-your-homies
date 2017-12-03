@@ -1,24 +1,28 @@
 import Vue from 'vue'
 import App from './components/app.js'
-import { view } from './services/store.js'
 import './index.styl'
 
-// HMR friendly bootstrapping for the modern era
+// HMR friendly bootstrapping
 (function bootstrap(anchorElement){
-    if(Vue.component('az-root')){
-        Vue.component('az-root', {
+    if(!Vue.component('Anchor')){
+        Vue.component('Anchor', {
             components: { App },
-            render: (__) => <App/>,
+            render( ){ return <App/> },
         });
-        var vm = new Vue({ 
-            anchorElement, 
-            render: (__) => <az-root/>,
+        let Anchor = {
+            components: { App },
+            render( ){ return <App/> },
+        };
+        let vm = new Vue({ 
+            el: anchorElement,
+            components: { Anchor },
+            render( ){ return <Anchor/> },
         });
         window.__bootstrap__ = {
             update: (__) => vm.$forceUpdate(vm),
             id: module.id,
         };
-    } else if(window.__bootstrap__.id == module.id){ 
+    } else if((window.__bootstrap__||{}).id == module.id){ 
         window.__bootstrap__.update();
     }
 })(document.getElementById('anchor'));
