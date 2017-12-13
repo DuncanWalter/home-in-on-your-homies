@@ -12,24 +12,24 @@
 //     src: url(../static/fonts/chosence.regular.otf);
 
 // extremely crude global responsives
-// most responsive design should be handled on a component basis
-@media (min-width: 1200px)
-    html  
-        font-size: 13pt
-    .container  
-        span( 0.62, 0.19 )
+// // most responsive design should be handled on a component basis
+// @media (min-width: 1200px)
+//     html  
+//         font-size: 13pt
+//     .container  
+//         span( 0.62, 0.19 )
 
-@media (max-width: 1200px) and (min-width: 700px)
-    html
-        font-size: 12pt 
-    .container
-        span( 0.78, 0.11 )
+// @media (max-width: 1200px) and (min-width: 700px)
+//     html
+//         font-size: 12pt 
+//     .container
+//         span( 0.78, 0.11 )
 
-@media (max-width: 700px)
-    html 
-        font-size: 11pt
-    .container 
-        span( 0.92, 0.04 )     
+// @media (max-width: 700px)
+//     html 
+//         font-size: 11pt
+//     .container 
+//         span( 0.92, 0.04 )     
 
 html 
     font-family: Roboto, sans-serif
@@ -57,142 +57,142 @@ title = 3.6rem
     transition: inherit
     font-size: inherit
 
-// the style for the shadows used by materials
-shadow( depth )
-    box-shadow: 
-        0 0 2px rgba(0,0,0,0.18),
-        0 (depth * 0.2px) (depth * 0.4px) (depth * 0.2px) rgba(0,0,0,0.18), 
-        0 (depth * 0.3px) (depth * 0.8px) (depth * 0.4px) rgba(0,0,0,0.08);
+// // the style for the shadows used by materials
+// shadow( depth )
+//     box-shadow: 
+//         0 0 2px rgba(0,0,0,0.18),
+//         0 (depth * 0.2px) (depth * 0.4px) (depth * 0.2px) rgba(0,0,0,0.18), 
+//         0 (depth * 0.3px) (depth * 0.8px) (depth * 0.4px) rgba(0,0,0,0.08);
 
 
-// ensuring easy font contrast TODO error on weird greyscale
-colored( color )
-    transition: 0.2s ease
-    background-color: color
-    if lightness( color ) > 50%
-        color: alpha(dark, 0.92)
-    else
-        color: alpha(light, 0.92)
+// // ensuring easy font contrast TODO error on weird greyscale
+// colored( color )
+//     transition: 0.2s ease
+//     background-color: color
+//     if lightness( color ) > 50%
+//         color: alpha(dark, 0.92)
+//     else
+//         color: alpha(light, 0.92)
 
-// emulating google materials
-material( depth, color )
-    colored( color )
-    shadow( depth )
+// // emulating google materials
+// material( depth, color )
+//     colored( color )
+//     shadow( depth )
 
-// mouse-over feedback for elements with interactions
-interactive( depth, color )
-    material( depth, color )
-    &:hover
-        shadow( depth * 1.4 + 7 )
-        if lightness( color ) > 50%
-            background-color: tint( color, 3% )
-        else
-            background-color: shade( color, 3% )
+// // mouse-over feedback for elements with interactions
+// interactive( depth, color )
+//     material( depth, color )
+//     &:hover
+//         shadow( depth * 1.4 + 7 )
+//         if lightness( color ) > 50%
+//             background-color: tint( color, 3% )
+//         else
+//             background-color: shade( color, 3% )
 
-pads( scale )
-    padding: (scale * 0.4)
+// pads( scale )
+//     padding: (scale * 0.4)
 
-margins( scale )
-    margin: (scale * 0.4)
+// margins( scale )
+//     margin: (scale * 0.4)
 
-.padded
-    pads( body )
+// .padded
+//     pads( body )
 
-.guarded
-    margins( body )
+// .guarded
+//     margins( body )
 
-.card
-    material( 7, dark )
-    margins( body )
-    & .header
-        colored( pri )
-        pads( body )
-    & .content
-        colored( light )
-        pads( body )
-    & .focus
-        colored( acc )
-        pads( body )
-    & .contrast
-        colored( dark )
-        pads( body )
-    & .hollow
-        pads( body )
-    & hr
-        height: 3px
-        width: 100%
-        margin: 0
-        border: none
+// .card
+//     material( 7, dark )
+//     margins( body )
+//     & .header
+//         colored( pri )
+//         pads( body )
+//     & .content
+//         colored( light )
+//         pads( body )
+//     & .focus
+//         colored( acc )
+//         pads( body )
+//     & .contrast
+//         colored( dark )
+//         pads( body )
+//     & .hollow
+//         pads( body )
+//     & hr
+//         height: 3px
+//         width: 100%
+//         margin: 0
+//         border: none
 
-.img, img
-    object-fit: contain
-    width: 100%
-    height: 100%
+// .img, img
+//     object-fit: contain
+//     width: 100%
+//     height: 100%
 
-h1
-    font-size: title
-    margin: large
-    letter-spacing: 0.2rem
+// h1
+//     font-size: title
+//     margin: large
+//     letter-spacing: 0.2rem
 
-p
-    margin: (body * 0.3)
-    font-size: body
+// p
+//     margin: (body * 0.3)
+//     font-size: body
 
-.centered
-    align-content: center
-    text-align: center
-    justify-content: center
-    align-items: center
+// .centered
+//     align-content: center
+//     text-align: center
+//     justify-content: center
+//     align-items: center
 
-body 
-    margin: 0
-    min-height: 100vh
-    colored( tint(dark, 15%) )
+// body 
+//     margin: 0
+//     min-height: 100vh
+//     colored( tint(dark, 15%) )
 
-.row 
-    display: flex
-    align-items: center
-    justify-content: center
-    & .stacked
-        margin: 0 (body*0.4) 0
+// .row 
+//     display: flex
+//     align-items: center
+//     justify-content: center
+//     & .stacked
+//         margin: 0 (body*0.4) 0
 
-.col
-    display: flex;
-    flex-direction: column;
+// .col
+//     display: flex;
+//     flex-direction: column;
 
-.button.clear
-    pads(small)
-    cursor: pointer
+// .button.clear
+//     pads(small)
+//     cursor: pointer
 
-.f1 { flex: 1  ; }
-.f2 { flex: 2  ; }
-.f3 { flex: 3  ; }
-.f4 { flex: 4  ; }
-.f5 { flex: 5  ; }
-.f6 { flex: 6  ; }
-.f7 { flex: 7  ; }
-.f8 { flex: 8  ; }
-.f9 { flex: 9  ; }
-.f10{ flex: 10 ; }
-.f11{ flex: 11 ; }
-.f12{ flex: 12 ; }
+// .f1 { flex: 1  ; }
+// .f2 { flex: 2  ; }
+// .f3 { flex: 3  ; }
+// .f4 { flex: 4  ; }
+// .f5 { flex: 5  ; }
+// .f6 { flex: 6  ; }
+// .f7 { flex: 7  ; }
+// .f8 { flex: 8  ; }
+// .f9 { flex: 9  ; }
+// .f10{ flex: 10 ; }
+// .f11{ flex: 11 ; }
+// .f12{ flex: 12 ; }
 
-.square {
-    position: relative;
-    width: 100%;
-}
-.square:after {
-    content: "";
-    display: block;
-    padding-bottom: 100%;
-}
+// .square {
+//     position: relative;
+//     width: 100%;
+// }
+// .square:after {
+//     content: "";
+//     display: block;
+//     padding-bottom: 100%;
+// }
 
-textarea {
-    background-color: lighten(dark, 5%);
-    color: inherit;
-    pads(body);
-    font-size: inherit;
-    font-family: Roboto, sans-serif;
-    border: none;
-    border-radius: 3px;
-}
+// textarea {
+//     background-color: lighten(dark, 5%);
+//     color: inherit;
+//     pads(body);
+//     font-size: inherit;
+//     font-family: Roboto, sans-serif;
+//     border: none;
+//     border-radius: 3px;
+// }
